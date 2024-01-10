@@ -119,7 +119,7 @@ adata_cm = data_bulk_adata.concatenate(data_sc_adata, join='inner', batch_key='d
 
 for i in range(args.n_replicates):
     print(f'DRUG==={DRUG}, 次数={i+1}')
-    adata = up.Run3(adatas=[data_bulk_adata, data_sc_adata], adata_cm=adata_cm, num_workers=4,
+    tmp = up.Run3(adatas=[data_bulk_adata, data_sc_adata], adata_cm=adata_cm, num_workers=4,
                     batch_size=args.batch_size,
                     ref_id=args.ref_id,
                     model_info=False,
@@ -152,6 +152,12 @@ for i in range(args.n_replicates):
                     drop=args.drop,
                     out=args.out,
                     save_OT=bool(args.save_OT),) #TODO,new feature
+    if bool(args.save_OT):
+        train = tmp[1][1]
+        print(f'####uniPortRun3.py#157rows,tmp[1][1].shape={tmp[1][1].shape}')
+        print(f'####uniPortRun3.py#158rows,tmp[0]={tmp[0]}')
+        train = pd.DataFrame(train)
+        train.to_csv('./drug/'+DRUG+'/'+str(DRUG)+'_OT_plan.csv', sep=',', index=False)
 ###########################################################2.模型训练，END
 
 t1 = time.time()
