@@ -3179,6 +3179,7 @@ class VAE(nn.Module):
             global_match=False, ###TODO,new feature
             mmd_GAMMA=1000.0, #Gamma parameter in the kernel of the MMD loss of the transfer learning, default: 1000
             lambda_mmd=1.0, ###TODO,new feature
+            optimal_transmission=True,
         ):
         """
         train VAE
@@ -3426,14 +3427,14 @@ class VAE(nn.Module):
 
                                     ot_loss += ot_loss_tmp
 
-                        if cell_regularization:
-                            loss = {'recloss':lambda_recon*recon_loss, 'klloss':lambda_kl*kl_loss, 'otloss':lambda_ot*ot_loss, 'drug_R_loss':lambda_response*drug_response_loss, 'cell_R_loss':lambda_cell*cell_regularization_loss} #
-                        else:
-                            loss = {'recloss':lambda_recon*recon_loss, 'klloss':lambda_kl*kl_loss, 'otloss':lambda_ot*ot_loss, 'drug_response_loss':lambda_response*drug_response_loss} #
                         
+                        loss = {'recloss':lambda_recon*recon_loss, 'klloss':lambda_kl*kl_loss, 'drug_response_loss':lambda_response*drug_response_loss} #
+                        if optimal_transmission:
+                            loss['otloss'] = lambda_ot*ot_loss
                         if global_match:
                             loss['mmd_loss'] = lambda_mmd*mmd_loss
-                            
+                        if cell_regularization:
+                            loss['cell_R_loss'] = lambda_cell*cell_regularization_loss
                         optim.zero_grad()
                         sum(loss.values()).backward()#TODO，疑问，可以这样子后向传播吗？
                         optim.step()
@@ -4085,6 +4086,7 @@ class VAE(nn.Module):
             global_match=False, ###TODO,new feature
             mmd_GAMMA=1000.0, #Gamma parameter in the kernel of the MMD loss of the transfer learning, default: 1000
             lambda_mmd=1.0, ###TODO,new feature
+            optimal_transmission=True,
             
         ):
         """
@@ -4328,21 +4330,21 @@ class VAE(nn.Module):
 
                                     ot_loss += ot_loss_tmp
    
-                        if cell_regularization:
-                            loss = {'recloss':lambda_recon*recon_loss, 'klloss':lambda_kl*kl_loss, 'otloss':lambda_ot*ot_loss, 'drug_R_loss':lambda_response*drug_response_loss, 'cell_R_loss':lambda_cell*cell_regularization_loss} #
-                        else:
-                            loss = {'recloss':lambda_recon*recon_loss, 'klloss':lambda_kl*kl_loss, 'otloss':lambda_ot*ot_loss, 'drug_response_loss':lambda_response*drug_response_loss} #
-                        
+                        loss = {'recloss':lambda_recon*recon_loss, 'klloss':lambda_kl*kl_loss, 'drug_response_loss':lambda_response*drug_response_loss} #
+                        if optimal_transmission:
+                            loss['otloss'] = lambda_ot*ot_loss
                         if global_match:
                             loss['mmd_loss'] = lambda_mmd*mmd_loss
+                        if cell_regularization:
+                            loss['cell_R_loss'] = lambda_cell*cell_regularization_loss
                             
                         optim.zero_grad()
                         sum(loss.values()).backward()#TODO，疑问，可以这样子后向传播吗？
                         optim.step()
 
                         for k,v in loss.items():
-                            epoch_loss[k] += loss[k].item() #TODO 疑问，loss[k].item()是什么, k=recloss,v=2528.068359375,loss.items()=dict_items([('recloss', tensor(...)), ('klloss', tensor(...)), ('otloss', tensor(...))])
-                            #print(f'#######vae.py#555rows#############(k,v) in loss.items()====k={k},v={v}')
+                            epoch_loss[k] += loss[k].item()
+                            
 
                         info = ','.join(['{}={:.2f}'.format(k, v) for k,v in loss.items()])
                         tk0.set_postfix_str(info)

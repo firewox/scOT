@@ -1347,6 +1347,7 @@ def Run3( # 不使用早停机制（epoch固定）
         global_match=False,###TODO,new feature
         mmd_GAMMA=1000.0,###TODO,new feature
         lambda_mmd=1.0,###TODO,new feature
+        optimal_transmission=True,
     ):
 
     """
@@ -1521,7 +1522,6 @@ def Run3( # 不使用早停机制（epoch固定）
     if out == 'latent':
         print(f'####function.py#1522rows, out={out},训练模型')
         for i, adata in enumerate(adatas):
-            # print('Dataset {}:'.format(i), adata.obs[source_name][0])
             print(adata)
         print('Reference dataset is dataset {}'.format(ref_id))
         print('\n')
@@ -1531,26 +1531,15 @@ def Run3( # 不使用早停机制（epoch固定）
             print(adata_cm)
             print('\n')
         
-        if global_match:
+        if global_match and optimal_transmission:
             print(f'####function.py##1535rows, 全局匹配MMD+局部匹配OT')
-        else:
+        elif not global_match and optimal_transmission:
             print(f'####function.py##1537rows, 局部匹配OT')
+        elif global_match and not optimal_transmission:
+            print(f'####function.py##1539rows, 全局匹配MMD')
         
-        '''trainloader, testloader = load_data(
-            adatas=adatas, 
-            mode=mode,
-            use_rep=use_rep,
-            num_cell=num_cell,
-            max_gene=max(num_gene), 
-            adata_cm=adata_cm,
-            use_specific=use_specific, 
-            domain_name=batch_key, #batch_key，Name of batch in AnnData. Default: domain_id
-            batch_size=batch_size, #batch_size，default 256
-            num_workers=num_workers #number parallel load processes according to cpu cores.
-        )'''
-        
-        if sampler=='smote':
-            print(f'####function.py#1553row, 取样方式=sampler={sampler}')
+        if sampler=='smote': 
+            print(f'####function.py#1543row, 取样方式=sampler={sampler}')
             if unshared_encoder: #TODO 分开使用两个编码器， unshared_encoder=True
                 Ctrainloader, Ptrainloader, testloader = load_data_smote_unshared_encoder(
                     num_cell_copy,
@@ -1573,9 +1562,8 @@ def Run3( # 不使用早停机制（epoch固定）
                     num_workers=num_workers,
                     over_sampling_strategy=over_sampling_strategy,
                     under_sampling_strategy=under_sampling_strategy)
-            # print(f'####function.py#1454row, num_cell_copy==={num_cell_copy}')
         elif sampler=='weight':
-            print(f'####function.py#1578row, 取样方式=sampler={sampler}')
+            print(f'####function.py#1566row, 取样方式=sampler={sampler}')
             if unshared_encoder: #TODO 分开使用两个编码器， unshared_encoder=True
                 Ctrainloader, Ptrainloader, testloader = load_data_weight_unshared_encoder(
                     adatas=adatas,
@@ -1593,7 +1581,7 @@ def Run3( # 不使用早停机制（epoch固定）
                     shuffle=True,
                     num_workers=num_workers)
         else:
-            print(f'####function.py#1596row, 不取样=sampler={sampler}')
+            print(f'####function.py#1584row, 不取样=sampler={sampler}')
             if unshared_encoder: #TODO 分开使用两个编码器， unshared_encoder=True
                 trainloader, testloader = load_data_unshared_encoder(
                     adatas=adatas, 
@@ -1602,9 +1590,9 @@ def Run3( # 不使用早停机制（epoch固定）
                     num_cell=num_cell,
                     max_gene=max(num_gene), 
                     adata_cm=adata_cm,
-                    domain_name=batch_key, #batch_key，Name of batch in AnnData. Default: domain_id
-                    batch_size=batch_size, #batch_size，default 256
-                    num_workers=num_workers, #number parallel load processes according to cpu cores.
+                    domain_name=batch_key,
+                    batch_size=batch_size, 
+                    num_workers=num_workers,
                     )
             else:
                 trainloader, testloader = load_data(
@@ -1615,13 +1603,13 @@ def Run3( # 不使用早停机制（epoch固定）
                     max_gene=max(num_gene), 
                     adata_cm=adata_cm,
                     use_specific=use_specific, 
-                    domain_name=batch_key, #batch_key，Name of batch in AnnData. Default: domain_id
-                    batch_size=batch_size, #batch_size，default 256
-                    num_workers=num_workers, #number parallel load processes according to cpu cores.
+                    domain_name=batch_key, 
+                    batch_size=batch_size, 
+                    num_workers=num_workers, 
                     )
         
-        #TODO,疑问，trainloader里的数据和testloader里的数据有什么区别？
-        # print(f'###function.py#1##########trainloader={trainloader},testloader={testloader}')
+        
+        
         early_stopping = EarlyStopping(patience=patience, checkpoint_file=outdir+'/checkpoint/'+DRUG+'_model.pt', verbose=False)
         
         if save_OT:
@@ -1862,6 +1850,7 @@ def Run3( # 不使用早停机制（epoch固定）
                         global_match=global_match, #TODO new feature
                         mmd_GAMMA=mmd_GAMMA, #TODO new feature
                         lambda_mmd=lambda_mmd, #TODO new feature
+                        optimal_transmission=optimal_transmission,
                     )
                 else:
                     model.fit2_1_unshared_decoder( # 只分开使用两个解码器，编码器共享，不平衡取样
@@ -1893,9 +1882,10 @@ def Run3( # 不使用早停机制（epoch固定）
                         global_match=global_match, #TODO new feature
                         mmd_GAMMA=mmd_GAMMA, #TODO new feature
                         lambda_mmd=lambda_mmd, #TODO new feature
+                        optimal_transmission=optimal_transmission,
                     )
         else: #TODO 使用共享解码器, unshared_decoder=False
-            print(f'####function.py##1828rows, 使用共享编码器，共享解码器')
+            print(f'####function.py##1888rows, 使用共享编码器，共享解码器')
             if sampler=='smote' or sampler=='weight':
                 model.fit2( # 使用共享编码器和共享解码器，smote、weight取样
                     #trainloader,
@@ -1913,8 +1903,8 @@ def Run3( # 不使用早停机制（epoch固定）
                     lambda_recon=lambda_recon,
                     lambda_kl=lambda_kl,
                     lambda_ot=lambda_ot,
-                    lambda_response=lambda_response,#TODO new feature
-                    lambda_cell=lambda_cell, #TODO new feature
+                    lambda_response=lambda_response,
+                    lambda_cell=lambda_cell, 
                     reg=reg,
                     reg_m=reg_m,
                     lr=lr,
@@ -1922,12 +1912,12 @@ def Run3( # 不使用早停机制（epoch固定）
                     verbose=verbose,
                     loss_type=loss_type,
                     drug_response=drug_response,
-                    cell_regularization=cell_regularization, #TODO new feature
+                    cell_regularization=cell_regularization, 
                     adata_cm=adata_cm,
                     n_epoch=n_epoch,
-                    global_match=global_match, #TODO new feature
-                    mmd_GAMMA=mmd_GAMMA, #TODO new feature
-                    lambda_mmd=lambda_mmd, #TODO new feature
+                    global_match=global_match, 
+                    mmd_GAMMA=mmd_GAMMA, 
+                    lambda_mmd=lambda_mmd, 
                 )
             else:
                 model.fit2_1( # 使用共享编码器和共享解码器，不平衡取样
@@ -1953,19 +1943,19 @@ def Run3( # 不使用早停机制（epoch固定）
                     verbose=verbose,
                     loss_type=loss_type,
                     drug_response=drug_response,
-                    cell_regularization=cell_regularization, #TODO new feature
+                    cell_regularization=cell_regularization, 
                     adata_cm=adata_cm,
                     n_epoch=n_epoch,
-                    global_match=global_match, #TODO new feature
-                    mmd_GAMMA=mmd_GAMMA, #TODO new feature
-                    lambda_mmd=lambda_mmd, #TODO new feature
+                    global_match=global_match, 
+                    mmd_GAMMA=mmd_GAMMA, 
+                    lambda_mmd=lambda_mmd, 
                 )
                 
         torch.save({'enc':enc, 'dec':dec, 'n_domain':n_domain, 'ref_id':ref_id, 'num_gene':num_gene, 'batch_size':batch_size,'lambda_recon':lambda_recon, 'lambda_kl':lambda_kl, 'lambda_ot':lambda_ot, 'lambda_response':lambda_response, 'sampler':sampler, 'unshared_decoder':unshared_decoder, 'unshared_encoder':unshared_encoder, 'global_match':global_match, 'cell_regularization':cell_regularization}, outdir+'/checkpoint/'+DRUG+'_config.pt')
         torch.save(model.state_dict(), outdir+'/checkpoint/'+DRUG+'_model.pt')
     # predict
     else:
-        print(f'####function.py#1965rows, out={out},使用checkpoint加载模型')
+        print(f'####function.py#1958rows, out={out},使用checkpoint加载模型')
         state = torch.load(outdir+'/checkpoint/'+DRUG+'_config.pt')
         enc, dec, n_domain, ref_id, num_gene, batch_size, lambda_recon, lambda_kl, lambda_ot, lambda_response, sampler, unshared_decoder, unshared_encoder, global_match, cell_regularization = state['enc'], state['dec'], state['n_domain'], state['ref_id'], state['num_gene'], state['batch_size'], state['lambda_recon'], state['lambda_kl'], state['lambda_ot'], state['lambda_response'], state['sampler'], state['unshared_decoder'], state['unshared_encoder'], state['global_match'], state['cell_regularization']
         model = VAE(enc, dec, ref_id=ref_id, n_domain=n_domain, mode=mode,batch_size=batch_size,lambda_recon=lambda_recon,lambda_kl=lambda_kl,lambda_ot=lambda_ot,lambda_response=lambda_response)

@@ -54,6 +54,7 @@ parser.add_argument('--lambda_mmd', type=float, default=1.0, help='weight of mmd
 parser.add_argument('--drop', type=float, default=0.5, help='drop of drug response predictor model')
 parser.add_argument('--out', type=str, default='latent', help='option: (latent, predict). latent represents training, and predict represents using checkpoint to predict')
 parser.add_argument('--save_OT', type=int, default=0, help='option: (0, 1). 0 means not saving OT plan, and 1 means saving OT plan')
+parser.add_argument('--optimal_transmission', type=int, default=1, help='option: (0, 1). 0 means not using optimal transmission, and 1 means using optimal transmission')
 args = parser.parse_args()
 seed = args.seed
 n_epoch = args.n_epoch
@@ -201,7 +202,8 @@ for i in range(args.n_replicates):
                     lambda_mmd=args.lambda_mmd,
                     drop=args.drop,
                     out=args.out,
-                    save_OT=bool(args.save_OT),) #TODO,new feature
+                    save_OT=bool(args.save_OT),
+                    optimal_transmission=bool(args.optimal_transmission),) #TODO,new feature
     if bool(args.save_OT):
         train = tmp[1][1]
         print(f'####uniPortRun4.py#207rows,tmp[1][1].shape={tmp[1][1].shape}')
