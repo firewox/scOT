@@ -119,7 +119,7 @@ adata_cm = data_bulk_adata.concatenate(data_sc_adata, join='inner', batch_key='d
 ###########################################################2.模型训练，START
 
 for i in range(args.n_replicates):
-    #print(f'DRUG==={DRUG}, 次数={i+1}')
+    print(f'DRUG==={DRUG}, 次数={i+1}')
     tmp = up.Run3(adatas=[data_bulk_adata, data_sc_adata], adata_cm=adata_cm, num_workers=4,
                     batch_size=args.batch_size,
                     ref_id=args.ref_id,
