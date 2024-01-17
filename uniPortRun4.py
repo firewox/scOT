@@ -166,9 +166,9 @@ if not (bool(args.unshared_encoder) and bool(args.unshared_decoder)):
 #for i in range(len(epoch_list)): # TODO 临时性的措施，寻找完最优参数后，这段代码就注释掉
 #    n_epoch = epoch_list[i] # TODO 临时性的措施，寻找完最优参数后，这段代码就注释掉
 for i in range(args.n_replicates):
-    if args.n_replicates == 6:
-        seed = seed_list[i] # TODO 临时性的措施，寻找完最优参数后，这段代码就注释掉
-    print(f'DRUG==={DRUG}, 次数={i+1}，n_epoch={n_epoch}，seed={seed}')
+    #if args.n_replicates == 6:
+    #    seed = seed_list[i] # TODO 临时性的措施，寻找完最优参数后，这段代码就注释掉
+    #print(f'DRUG==={DRUG}, 次数={i+1}，n_epoch={n_epoch}，seed={seed}')
     tmp = up.Run3(adatas=[data_bulk_adata, data_sc_adata], adata_cm=adata_cm, num_workers=4,
                     batch_size=args.batch_size,
                     ref_id=args.ref_id,
