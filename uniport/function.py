@@ -1950,9 +1950,9 @@ def Run3( # 不使用早停机制（epoch固定）
                     mmd_GAMMA=mmd_GAMMA, 
                     lambda_mmd=lambda_mmd, 
                 )
-                
-        torch.save({'enc':enc, 'dec':dec, 'n_domain':n_domain, 'ref_id':ref_id, 'num_gene':num_gene, 'batch_size':batch_size,'lambda_recon':lambda_recon, 'lambda_kl':lambda_kl, 'lambda_ot':lambda_ot, 'lambda_response':lambda_response, 'sampler':sampler, 'unshared_decoder':unshared_decoder, 'unshared_encoder':unshared_encoder, 'global_match':global_match, 'cell_regularization':cell_regularization}, outdir+'/checkpoint/'+DRUG+'_config.pt')
-        torch.save(model.state_dict(), outdir+'/checkpoint/'+DRUG+'_model.pt')
+        #TODO 暂时注释这两行代码，提高计算机运行性能
+        #torch.save({'enc':enc, 'dec':dec, 'n_domain':n_domain, 'ref_id':ref_id, 'num_gene':num_gene, 'batch_size':batch_size,'lambda_recon':lambda_recon, 'lambda_kl':lambda_kl, 'lambda_ot':lambda_ot, 'lambda_response':lambda_response, 'sampler':sampler, 'unshared_decoder':unshared_decoder, 'unshared_encoder':unshared_encoder, 'global_match':global_match, 'cell_regularization':cell_regularization}, outdir+'/checkpoint/'+DRUG+'_config.pt')
+        #torch.save(model.state_dict(), outdir+'/checkpoint/'+DRUG+'_model.pt')
     # predict
     else:
         print(f'####function.py#1958rows, out={out},使用checkpoint加载模型')
