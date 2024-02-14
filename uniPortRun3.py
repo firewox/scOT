@@ -54,6 +54,7 @@ parser.add_argument('--drop', type=float, default=0.5, help='drop of drug respon
 parser.add_argument('--out', type=str, default='latent', help='option: (latent, predict). latent represents training, and predict represents using checkpoint to predict')
 parser.add_argument('--save_OT', type=int, default=0, help='option: (0, 1). 0 means not saving OT plan, and 1 means saving OT plan')
 parser.add_argument('--optimal_transmission', type=int, default=1, help='option: (0, 1). 0 means not using optimal transmission, and 1 means using optimal transmission')
+parser.add_argument('--mode', type=str, default="gdsc", help='option: (gdsc, gdsc_ccle).')
 args = parser.parse_args()
 DRUG = args.drug_name
 # 共享编码器 shared encoder
@@ -67,7 +68,12 @@ encoder_h_dims_target = args.encoder_h_dims_target.split(",")
 encoder_h_dims_target = list(map(int, encoder_h_dims_target))
 ###########################################################1 读取bulk_data，读取scRNA数据，START
 # linux版本
-data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
+if args.mode=="gdsc_ccle":
+    print(f'gdsc_ccle')
+    data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/gdsc_ccle/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
+else:
+    print(f'ccle')
+    data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 # windows版本
 # data_r=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Source_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 data_bulk = data_r.iloc[:,2:]
@@ -82,7 +88,12 @@ data_bulk_adata.X = scaler.fit_transform(data_bulk_adata.X)
 #print(f'data_bulk_adata==={data_bulk_adata}') #n_obs × n_vars = 829 × 10610
 
 # linux版本
-data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
+if args.mode=="gdsc_ccle":
+    print(f'gdsc_ccle')
+    data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
+else:
+    print(f'ccle')
+    data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
 # windows版本
 # data_t=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Target_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.')
 data_sc = data_t.iloc[:,1:]
