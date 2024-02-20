@@ -98,7 +98,7 @@ else:
 # windows版本
 # data_t=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Target_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.')
 if args.random_sample==1:
-    data_t = data_t.sample(frac=0.8)
+    data_t = data_t.sample(frac=0.8, random_state=args.seed)
 data_sc = data_t.iloc[:,1:]
 data_sc_label = data_t.iloc[:,:1]
 data_sc_adata = sc.AnnData(data_sc)
