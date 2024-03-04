@@ -56,6 +56,7 @@ parser.add_argument('--save_OT', type=int, default=0, help='option: (0, 1). 0 me
 parser.add_argument('--optimal_transmission', type=int, default=1, help='option: (0, 1). 0 means not using optimal transmission, and 1 means using optimal transmission')
 parser.add_argument('--mode', type=str, default="gdsc", help='option: (gdsc, gdsc_ccle).')
 parser.add_argument('--random_sample', type=int, default=0, help='option: (0, 1). 0 means not randomly stratified sampling, and 1 means randomly stratified sampling')
+parser.add_argument('--simulated_sample', type=int, default=0, help='option: (0, 1). 0 means using true data, and 1 means using simulated data')
 args = parser.parse_args()
 DRUG = args.drug_name
 # 共享编码器 shared encoder
@@ -73,7 +74,7 @@ if args.mode=="gdsc_ccle":
     print(f'gdsc_ccle')
     data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/gdsc_ccle/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 else:
-    print(f'ccle')
+    print(f'gdsc')
     data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 # windows版本
 # data_r=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Source_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
@@ -93,10 +94,14 @@ if args.mode=="gdsc_ccle":
     print(f'gdsc_ccle')
     data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/gdsc_ccle/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
 else:
-    print(f'ccle')
+    print(f'gdsc')
     data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
 # windows版本
 # data_t=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Target_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.')
+if args.simulated_sample==1:
+    print(f'####simulated_sample===True')
+    data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Simulated_Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
+    
 if args.random_sample==1:
     print(f'randomly stratified sampling')
     #data_t = data_t.sample(frac=0.8, random_state=args.seed)
