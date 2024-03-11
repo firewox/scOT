@@ -1699,16 +1699,15 @@ def Run3( # 不使用早停机制（epoch固定）
                     #          ['drug_response', 128, 1, 'relu', 0.5],
                     #          ['drug_response', 64, 1, 'relu', 0.5],
                     #          ['drug_response', 1, 3, 'sigmoid', 0]] # 使用bulk细胞系数据训练药物响应预测模型, [model_name='drug_response', out_dim=1, norm=1, activation='sigmoid', droupt=0]
-                    dec[i] = [['drug_response', 128, 1, 'relu', drop],
-                              ['drug_response', 128, 1, 'relu', drop],
-                              ['drug_response', 128, 1, 'relu', drop],
-                              ['drug_response', 128, 1, 'relu', drop],
-                              ['drug_response', 64, 1, 'relu', drop],
-                              ['drug_response', 1, 3, 'sigmoid', 0]] # 使用bulk细胞系数据训练药物响应预测模型, [model_name='drug_response', out_dim=1, norm=1, activation='sigmoid', droupt=0]
-                    #dec[i] = [['drug_response', 1024, 1, 'relu', 0.3],
-                    #          ['drug_response', 512, 1, 'relu', 0.3],
-                    #          ['drug_response', 256, 1, 'relu', 0.3],
+                    #dec[i] = [['drug_response', 128, 1, 'relu', drop],
+                    #          ['drug_response', 128, 1, 'relu', drop],
+                    #          ['drug_response', 128, 1, 'relu', drop],
+                    #          ['drug_response', 128, 1, 'relu', drop],
+                    #          ['drug_response', 64, 1, 'relu', drop],
                     #          ['drug_response', 1, 3, 'sigmoid', 0]] # 使用bulk细胞系数据训练药物响应预测模型, [model_name='drug_response', out_dim=1, norm=1, activation='sigmoid', droupt=0]
+                    dec[i] = [['drug_response', 256, 1, 'relu', drop],
+                              ['drug_response', 256, 1, 'relu', drop],
+                              ['drug_response', 1, 3, 'sigmoid', 0]] # 使用bulk细胞系数据训练药物响应预测模型, [model_name='drug_response', out_dim=1, norm=1, activation='sigmoid', droupt=0]
                     #print(f'####药物响应预测={i},dec[i]={dec[i]}')
             
             unshared_decoder = unshared_decoder
