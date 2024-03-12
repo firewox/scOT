@@ -1458,6 +1458,8 @@ def Run3( # 不使用早停机制（epoch固定）
         os.environ['PYTHONHASHSEED'] = str(seed)
         print(f'####function.py#1252row,fix seed={seed}')
     else:
+        torch.manual_seed(42)
+        torch.cuda.manual_seed(42)
         np.random.seed(42)
         print(f'####function.py#1254row,do not fix seed')
     torch.backends.cudnn.deterministic = True
