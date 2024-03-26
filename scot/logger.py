@@ -1,8 +1,3 @@
-#!/usr/bin/env 
-"""
-# Author: Kai Cao
-# Modified from SCALEX
-"""
 
 import logging
 

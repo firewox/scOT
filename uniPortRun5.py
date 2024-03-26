@@ -1,4 +1,4 @@
-import uniport as up
+import scot as up
 import scanpy as sc
 import argparse
 import time

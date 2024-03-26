@@ -1,4 +1,4 @@
-import uniport as up
+import scot as up
 import scanpy as sc
 import argparse
 import time
@@ -47,7 +47,7 @@ parser.add_argument('--encoder_h_dims_target', type=str, default="256,256,256", 
 parser.add_argument('--lambda_cell', type=float, default=1.0, help='weight of cell_regularization_loss')
 parser.add_argument('--printgene', type=int, default=0, help='if printgene=1,then use IntegratedGradients; else do not use')
 parser.add_argument('--cell_regularization', type=int, default=0, help='if cell_regularization=1,then use cell regularization; else do not use')
-parser.add_argument('--global_match', type=int, default=0, help='if global_match=1,then use global matching; else do not use')
+parser.add_argument('--mmd_match', type=int, default=0, help='if mmd_match=1,then use mmd matching; else do not use')
 parser.add_argument('--mmd_GAMMA', type=float, default=1000.0, help='Gamma parameter in the kernel of the MMD loss of the transfer learning, default: 1000')
 parser.add_argument('--lambda_mmd', type=float, default=1.0, help='weight of mmd_loss')
 parser.add_argument('--drop', type=float, default=0.5, help='drop of drug response predictor model')
@@ -59,24 +59,24 @@ parser.add_argument('--random_sample', type=int, default=0, help='option: (0, 1)
 parser.add_argument('--simulated_sample', type=int, default=0, help='option: (0, 1). 0 means using true data, and 1 means using simulated data')
 args = parser.parse_args()
 DRUG = args.drug_name
-# 共享编码器 shared encoder
+#shared encoder
 encoder_h_dims = args.encoder_h_dims.split(",")
 encoder_h_dims = list(map(int, encoder_h_dims))
-# 源域数据的编码器、解码器 encoder and decoder of source domain data
+#encoder and decoder of source domain data
 encoder_h_dims_source = args.encoder_h_dims_source.split(",")
 encoder_h_dims_source = list(map(int, encoder_h_dims_source))
-# 目标域数据的编码器、解码器 encoder and decoder of target domain data
+#encoder and decoder of target domain data
 encoder_h_dims_target = args.encoder_h_dims_target.split(",")
 encoder_h_dims_target = list(map(int, encoder_h_dims_target))
 ###########################################################1 读取bulk_data，读取scRNA数据，START
-# linux版本
+# linux
 if args.mode=="gdsc_ccle":
     print(f'gdsc_ccle')
     data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/gdsc_ccle/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 else:
     print(f'gdsc')
     data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
-# windows版本
+# windows
 # data_r=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Source_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 data_bulk = data_r.iloc[:,2:]
 data_bulk_label = data_r.iloc[:,:1]
@@ -89,14 +89,14 @@ scaler = MinMaxScaler()
 data_bulk_adata.X = scaler.fit_transform(data_bulk_adata.X)
 #print(f'data_bulk_adata==={data_bulk_adata}') #n_obs × n_vars = 829 × 10610
 
-# linux版本
+# linux
 if args.mode=="gdsc_ccle":
     print(f'gdsc_ccle')
     data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/gdsc_ccle/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
 else:
     print(f'gdsc')
     data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
-# windows版本
+# windows
 # data_t=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Target_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.')
 if args.simulated_sample==1:
     print(f'####simulated_sample===True')

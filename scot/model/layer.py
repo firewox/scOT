@@ -1,8 +1,3 @@
-#!/usr/bin/env 
-"""
-# Author: Kai Cao
-# Modified from SCALEX
-"""
 
 import math
 import numpy as np
@@ -22,7 +17,7 @@ activation = {
     'sigmoid':nn.Sigmoid(),
     'leaky_relu':nn.LeakyReLU(),
     'tanh':nn.Tanh(),
-    'softmax':nn.Softmax(),#TODO new feature
+    'softmax':nn.Softmax(),
     '':None
 }
 
@@ -169,7 +164,6 @@ class NN(nn.Module):
                 d_in = input_dim
             if layer[0] == 'fc':
                 net.append(Block(d_in, *layer[1:]))
-            #TODO layer.py, drug_response decoder的网络结构
             if layer[0] == 'drug_response':
                 net.append(Block(d_in, *layer[1:]))
             d_in = layer[1]
@@ -185,16 +179,14 @@ class Encoder(nn.Module):
     """
     VAE Encoder
     """
-    def __init__(self, input_dim, cfg, mode):
+    def __init__(self, input_dim, cfg):
         """
         Parameters
         ----------
         input_dim
             input dimension
         cfg
-            encoder configuration, e.g. enc_cfg = [['fc', 1024, 1, 'relu'],['fc', 10, '', '']]
-        mode
-            training mode. ['h', 'd', 'v']
+            encoder configuration,
         """
         super().__init__()
 
@@ -202,20 +194,6 @@ class Encoder(nn.Module):
         mu_enc = []
         var_enc = []
 
-        ''' # old code
-        h_dim = cfg[-2][1]
-        if mode == 'd':
-            for i in input_dim.keys():             
-                enc.append(NN(input_dim[i], cfg[:-1]))
-                mu_enc.append(NN(h_dim, cfg[-1:]))
-                var_enc.append(NN(h_dim, cfg[-1:]))
-
-        else:
-            enc.append(NN(input_dim[0], cfg[:-1]))
-            mu_enc.append(NN(h_dim, cfg[-1:]))
-            var_enc.append(NN(h_dim, cfg[-1:]))
-        '''
-        # TODO new code
         for i in cfg.keys(): # input_dim = {0:[...], 1:[...], 2:[...], 4:[...], 5:[...]}
             enc.append(NN(input_dim[i], cfg[i][:-1])) # cfg = {0:[...], 1:[...], 2:[...], 4:[...], 5:[...]}
             mu_enc.append(NN(cfg[i][-2][1], cfg[i][-1:]))
@@ -229,8 +207,6 @@ class Encoder(nn.Module):
         return Normal(mu, var.sqrt()).rsample()
 
     def forward(self, x, domain, y=None):
-        """
-        """
         q = self.enc[domain](x, y)
         mu = self.mu_enc[domain](q, y)
         var = torch.exp(self.var_enc[domain](q, y))
@@ -261,10 +237,6 @@ class Decoder(nn.Module):
 
 
     def forward(self, z, domain, y=None):
-        """
-        """
-        # print(f'####layer.py#254rows####################dec={self.dec}')
         reconx_x = self.dec[domain](z, y)
-
         return reconx_x
     

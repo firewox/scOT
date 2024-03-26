@@ -1,23 +1,12 @@
-#!/usr/bin/env 
-"""
-# Author: Kai Cao
-# Modified from RAE
-"""
 
 import torch
 import numpy as np
 from torch.distributions import Normal, kl_divergence
 
-def kl_div(mu, var, weight=None): # 计算高斯分布（μ，σ^2）和标准正态分布（0,1）之间的KL散度
+def kl_div(mu, var): # 计算高斯分布（μ，σ^2）和标准正态分布（0,1）之间的KL散度
     loss = kl_divergence(Normal(mu, var.sqrt()), Normal(torch.zeros_like(mu),torch.ones_like(var))).sum(dim=1)
-    
-    # if weight is not None:
-    #     loss = loss * weight.squeeze(dim=1)
     return loss.mean()
  
-# def balanced_binary_cross_entropy(recon_x, x):
-
-#     return -torch.sum(x * torch.log(recon_x + 1e-8) + (1 - x) * torch.log(1 - recon_x + 1e-8), dim=-1)
 
 def distance_matrix(pts_src: torch.Tensor, pts_dst: torch.Tensor, p: int = 2):
     """
@@ -71,11 +60,8 @@ def distance_gmm(mu_src: torch.Tensor, mu_dst: torch.Tensor, var_src: torch.Tens
     
     return distance_mean + distance_var + 1e-6
 
-def unbalanced_ot(tran, mu1, var1, mu2, var2, reg=0.1, reg_m=1.0, Couple=None, device='cpu', \
-    idx_q=None, idx_r=None, query_weight=None, ref_weight=None):
+def compute_ot(tran, mu1, var1, mu2, var2, reg=0.1, reg_m=1.0, device='cpu'):
     '''
-    Calculate a unbalanced optimal transport matrix between mini batches.
-
     Parameters
     ----------
     tran
@@ -92,43 +78,22 @@ def unbalanced_ot(tran, mu1, var1, mu2, var2, reg=0.1, reg_m=1.0, Couple=None, d
         Entropy regularization parameter in OT. Default: 0.1
     reg_m:
         Unbalanced OT parameter. Larger values means more balanced OT. Default: 1.0
-    Couple
-        prior information about weights between cell correspondence. Default: None
     device
         training device
-    idx_q
-        domain_id of query batch
-    idx_r
-        domain_id of reference batch
-    query_weight
-        reweighted vectors of query batch
-    ref_weight
-        reweighted vectors of reference batch
-
     Returns
     -------
     float
-        minibatch unbalanced optimal transport loss
+        optimal transport loss
     matrix
-        minibatch unbalanced optimal transport matrix
+        optimal transport matrix
     '''
 
     ns = mu1.size(0)
     nt = mu2.size(0)
 
     cost_pp = distance_gmm(mu1, mu2, var1, var2)
-
-    if query_weight is None: 
-        p_s = torch.ones(ns, 1) / ns
-    else:
-        query_batch_weight = query_weight[idx_q]
-        p_s = query_batch_weight/torch.sum(query_batch_weight)
-
-    if ref_weight is None: 
-        p_t = torch.ones(nt, 1) / nt
-    else:
-        ref_batch_weight = ref_weight[idx_r]
-        p_t = ref_batch_weight/torch.sum(ref_batch_weight)
+    p_s = torch.ones(ns, 1) / ns
+    p_t = torch.ones(nt, 1) / nt
 
     p_s = p_s.to(device)
     p_t = p_t.to(device)
@@ -141,10 +106,7 @@ def unbalanced_ot(tran, mu1, var1, mu2, var2, reg=0.1, reg_m=1.0, Couple=None, d
     f = reg_m / (reg_m + reg)
 
     for m in range(10):
-        if Couple is not None:
-            cost = cost_pp*Couple
-        else:
-            cost = cost_pp
+        cost = cost_pp
 
         kernel = torch.exp(-cost / (reg*torch.max(torch.abs(cost)))) * tran
         b = p_t / (torch.t(kernel) @ dual)
@@ -156,15 +118,7 @@ def unbalanced_ot(tran, mu1, var1, mu2, var2, reg=0.1, reg_m=1.0, Couple=None, d
     if torch.isnan(tran).sum() > 0:
         tran = (torch.ones(ns, nt) / (ns * nt)).to(device)
 
-    # pho = tran.mean()
-    # h_func = 1 - 0.5 * ( 1 + torch.sign(pho - tran) )
-    # hat_tran = tran * h_func
-    # d_fgw1 = (cost_pp * hat_tran.detach().data).sum()
-    # d_fgw2 = ((tran.detach().data - hat_tran.detach().data) * torch.log(1 + torch.exp(-cost_pp))).sum()
-    # d_fgw = d_fgw1 + d_fgw2
-
     d_fgw = (cost_pp * tran.detach().data).sum()
-
     return d_fgw, tran.detach()
 
 
