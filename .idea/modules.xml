@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/uniport_to_SCAD.iml" filepath="$PROJECT_DIR$/.idea/uniport_to_SCAD.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/scOT.iml" filepath="$PROJECT_DIR$/.idea/scOT.iml" />
     </modules>
   </component>
 </project>

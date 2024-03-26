@@ -15,7 +15,6 @@ from .model.vae import TargetModel
 from .model.utils import EarlyStopping
 from .logger import create_logger
 from .data_loader import load_data
-from .metrics import *
 
 from anndata import AnnData
 from sklearn.preprocessing import MaxAbsScaler
