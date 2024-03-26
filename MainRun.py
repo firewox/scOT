@@ -109,7 +109,7 @@ if bool(args.unshared_encoder) and bool(args.unshared_decoder):
 # transfer bulk to adata
 data_bulk_adata = sc.AnnData(data_bulk)
 data_bulk_adata.obs['response']=data_bulk_label.values.reshape(-1,)
-data_bulk_adata.obs['logIC50']=data_bulk_logIC50.values.reshape(-1,)
+data_bulk_adata.obs['status']=data_bulk_logIC50.values.reshape(-1,)
 
 # transfer sc to adata
 data_sc_adata = sc.AnnData(data_sc)
