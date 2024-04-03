@@ -6,7 +6,6 @@ import pandas as pd
 
 import numpy as np
 
-
 t0 = time.time()
 parser = argparse.ArgumentParser(description='feature settings')
 parser.add_argument('--drug_name', type=str, default='Gefitinib_scDEAL', help='drug name')
@@ -23,10 +22,10 @@ parser.add_argument('--n_epoch', type=int, default=1000, help='epoch of model tr
 parser.add_argument('--n_replicates', type=int, default=1, help='replicates of model training')
 parser.add_argument('--seed_flag', type=int, default=1, help='1 represent fix seed; 0 represent do not fix seed')
 parser.add_argument('--sampler', type=str, default='none', help='sampling method: smote、weight、none; none represent do not sample; default:smote')
-parser.add_argument('--source_batch', type=int, default=0, help='batch size of Source domain data')
-parser.add_argument('--target_batch', type=int, default=0, help='batch size of Target domain data')
-parser.add_argument('--over_sampling_strategy', type=float, default=0.5, help='')
-parser.add_argument('--under_sampling_strategy', type=float, default=0.5, help='')
+parser.add_argument('--source_batch', type=int, default=190, help='batch size of Source domain data')
+parser.add_argument('--target_batch', type=int, default=128, help='batch size of Target domain data')
+parser.add_argument('--over_sampling_strategy', type=float, default=0.8, help='')
+parser.add_argument('--under_sampling_strategy', type=float, default=0.8, help='')
 parser.add_argument('--unshared_decoder', type=int, default=0, help='if unshared_decoder=1,then use two decoder; else use shared decoder')
 parser.add_argument('--encoder_h_dims_source', type=str, default="1024,512,256", help='encoder_hidden_dims of bulk data')
 parser.add_argument('--encoder_h_dims_target', type=str, default="256,256,256", help='encoder_hidden_dims of sc data')
@@ -42,6 +41,7 @@ parser.add_argument('--out', type=str, default='latent', help='option: (latent, 
 parser.add_argument('--save_OT', type=int, default=0, help='option: (0, 1). 0 means not saving OT plan, and 1 means saving OT plan')
 parser.add_argument('--optimal_transmission', type=int, default=1, help='option: (0, 1). 0 means not using optimal transmission, and 1 means using optimal transmission')
 parser.add_argument('--random_sample', type=int, default=0, help='option: (0, 1). 0 means not randomly stratified sampling, and 1 means randomly stratified sampling')
+parser.add_argument('--data_path', type=str, default="/mnt/usb/code/lyutian/git_repositories/scOT/data/", help='data path')
 args = parser.parse_args()
 seed = args.seed
 n_epoch = args.n_epoch
@@ -56,8 +56,9 @@ encoder_h_dims_source = list(map(int, encoder_h_dims_source))
 encoder_h_dims_target = args.encoder_h_dims_target.split(",")
 encoder_h_dims_target = list(map(int, encoder_h_dims_target))
 ###########################################################1 READ Data，START
+print(str(DRUG))
 # linux
-data_r=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
+data_r=pd.read_csv(args.data_path + str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 # windows
 # data_r=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Source_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 data_bulk = data_r.iloc[:,2:]
@@ -65,7 +66,7 @@ data_bulk_label = data_r.iloc[:,:1]
 data_bulk_logIC50 = data_r.iloc[:,1:2]
 
 # linux
-data_t=pd.read_csv("/mnt/usb/code/lyutian/git_repositories/SCAD/data/split_norm/"+str(DRUG)+"/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
+data_t=pd.read_csv(args.data_path +str(DRUG)+"/Target_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.')
 # windows
 # data_t=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Target_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.')
 if args.random_sample==1:
@@ -91,7 +92,7 @@ if bool(args.unshared_encoder) and bool(args.unshared_decoder):
     # transfer bulk to adata
     data_bulk_adata_1 = sc.AnnData(data_bulk_1)
     data_bulk_adata_1.obs['response']=data_bulk_label.values.reshape(-1,)
-    data_bulk_adata_1.obs['logIC50']=data_bulk_logIC50.values.reshape(-1,)
+    data_bulk_adata_1.obs['status']=data_bulk_logIC50.values.reshape(-1,)
     # transfer sc to adata
     data_sc_adata_1 = sc.AnnData(data_sc_1)
     data_sc_adata_1.obs['response']=data_sc_label.values
