@@ -25,7 +25,7 @@ class VAE(nn.Module):
     """
     Variational Autoencoder framework
     """
-    def __init__(self, enc, dec, ref_id, n_domain, batch_size,lambda_recon,lambda_kl,lambda_ot,lambda_response):
+    def __init__(self, enc, dec, ref_id, n_domain, batch_size,lambda_recon,lambda_kl,lambda_ot,lambda_response,drop):
         """
         Parameters
         ----------
@@ -48,6 +48,7 @@ class VAE(nn.Module):
         self.lambda_kl=lambda_kl
         self.lambda_ot=lambda_ot
         self.lambda_response=lambda_response
+        self.drop=drop
         for key in dec.keys():
             if key!=3: #不把药物响应预测模型的维度，加到encoder里
                 x_dim[key] = dec[key][-1][1]
@@ -249,7 +250,7 @@ class VAE(nn.Module):
                         'APR_sc_test_avg='+str(APR_sc_test_avg)+'\t'
                         +str(now)+'\t'+'\t'+str(command_line)+'\t'+'\n')
 
-            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
+            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','drop','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
             file2 = './drug/'+str(DRUG)+'/'+str(DRUG)+'_auc_aupr'+'_result.xlsx'
             df_tmp=pd.DataFrame({
                 'drug': [str(DRUG)],
@@ -264,6 +265,7 @@ class VAE(nn.Module):
                 'lambda_kl': [str(self.lambda_kl)],
                 'lambda_ot': [str(self.lambda_ot)],
                 'lambda_response': [str(self.lambda_response)],
+                'drop': [str(self.drop)],
                 'sc_AUC': [str(AUC_sc_test_avg)],
                 'sc_AUPR': [str(APR_sc_test_avg)],
                 'bulk_AUC': [str(AUC_bulk_test_avg)],#TO DO
@@ -403,7 +405,7 @@ class VAE(nn.Module):
                         'APR_sc_test_avg='+str(APR_sc_test_avg)+'\t'+
                         str(now)+'\t'+'\t'+str(command_line)+'\t'+'\n')
             
-            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
+            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','drop','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
             file2 = './drug/'+str(DRUG)+'/'+str(DRUG)+'_auc_aupr'+'_result.xlsx'
             df_tmp=pd.DataFrame({
                 'drug': [str(DRUG)],
@@ -418,6 +420,7 @@ class VAE(nn.Module):
                 'lambda_kl': [str(self.lambda_kl)],
                 'lambda_ot': [str(self.lambda_ot)],
                 'lambda_response': [str(self.lambda_response)],
+                'drop': [str(self.drop)],
                 'sc_AUC': [str(AUC_sc_test_avg)],
                 'sc_AUPR': [str(APR_sc_test_avg)],
                 'bulk_AUC': [str(AUC_bulk_test_avg)],#TO DO
@@ -601,7 +604,7 @@ class VAE(nn.Module):
                         'APR_sc_test_avg='+str(APR_sc_test_avg)+'\t'
                         +str(now)+'\t'+str(command_line)+'\n')
 
-            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
+            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','drop','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
             file2 = './drug/'+str(DRUG)+'/'+str(DRUG)+'_auc_aupr'+'_result.xlsx'
             df_tmp=pd.DataFrame({
                 'drug': [str(DRUG)],
@@ -616,6 +619,7 @@ class VAE(nn.Module):
                 'lambda_kl': [str(self.lambda_kl)],
                 'lambda_ot': [str(self.lambda_ot)],
                 'lambda_response': [str(self.lambda_response)],
+                'drop': [str(self.drop)],
                 'sc_AUC': [str(AUC_sc_test_avg)],
                 'sc_AUPR': [str(APR_sc_test_avg)],
                 'bulk_AUC': [str(AUC_bulk_test_avg)],#TO DO
@@ -747,7 +751,7 @@ class VAE(nn.Module):
                         'APR_sc_test_avg='+str(APR_sc_test_avg)+'\t'
                         +'\t'+str(now)+'\t'+str(command_line)+'\n')
             
-            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
+            df = pd.DataFrame(columns=['drug', 'encoder_dim', 'decoder_dim', 'pdim','batch_size','source_batch','target_batch','sam','lambda_recon','lambda_kl','lambda_ot','lambda_response','drop','sc_AUC', 'sc_AUPR','bulk_AUC', 'bulk_AUPR'])
             file2 = './drug/'+str(DRUG)+'/'+str(DRUG)+'_auc_aupr'+'_result.xlsx'
             df_tmp=pd.DataFrame({
                 'drug': [str(DRUG)],
@@ -762,6 +766,7 @@ class VAE(nn.Module):
                 'lambda_kl': [str(self.lambda_kl)],
                 'lambda_ot': [str(self.lambda_ot)],
                 'lambda_response': [str(self.lambda_response)],
+                'drop': [str(self.drop)],
                 'sc_AUC': [str(AUC_sc_test_avg)],
                 'sc_AUPR': [str(APR_sc_test_avg)],
                 'bulk_AUC': [str(AUC_bulk_test_avg)],#TO DO

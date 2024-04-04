@@ -358,7 +358,8 @@ def Run(
                     lambda_recon=lambda_recon,
                     lambda_kl=lambda_kl,
                     lambda_ot=lambda_ot,
-                    lambda_response=lambda_response)
+                    lambda_response=lambda_response,
+                    drop=drop)
         if model_info:
             log.info('model\n'+model.__repr__())
         if cell_regularization:
