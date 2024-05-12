@@ -1,12 +1,10 @@
 ## 代码说明
 
-1. uniPortRun2.py
+1. MainRun.py
 
    ```python
    # 有早停机制，earlyStopping，不指定epoch
    ```
-
-2. uniPortRun3.py
 
    ```python
    # 可以固定随机种子 seed_flag=1，seed=124
@@ -15,8 +13,6 @@
    # 重复执行几次 n_replicates,
    # 数据训练前有另外的MinMaxScaler操作，适用于SCAD数据
    ```
-
-3. uniPortRun4.py
 
    ```python
    # 可以固定随机种子 seed_flag=1，seed=124
@@ -27,4 +23,5 @@
    ```
 
    
+
 
