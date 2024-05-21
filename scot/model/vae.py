@@ -991,8 +991,10 @@ class VAE(nn.Module):
                             #TODO, 使用两个解码器，不使用共享解码器
                             recon_x_bulk = self.decoder(z[loc[0]], 4, None)
                             recon_x_sc = self.decoder(z[loc[1]], 5, None)
-                            recon_loss_1 = loss_func(recon_x_bulk, x_bulk.float().to(device))
-                            recon_loss_2 = loss_func(recon_x_sc, x_sc.float().to(device))
+                            # 使用MSE，loss_func = nn.MSELoss()
+                            loss_func_1 = nn.MSELoss()
+                            recon_loss_1 = loss_func_1(recon_x_bulk, x_bulk.float().to(device))
+                            recon_loss_2 = loss_func_1(recon_x_sc, x_sc.float().to(device))
                             recon_loss = recon_loss_1 + recon_loss_2
 
                         kl_loss = kl_div(mu, var)
@@ -1384,7 +1386,9 @@ class VAE(nn.Module):
                         if label_weight is None: # default, label_weight is None
                             #recon_loss = loss_func(recon_x_c, x_c) * 2000 # default, loss_func = nn.BCELoss()#TODO，这里为什么要乘2000，为什么BCEloss损失为负数
                             #recon_loss = loss_func(recon_x_c, x_c) * num_gene[self.n_domain]
-                            recon_loss = loss_func(recon_x_c, x_c) 
+                            # 使用MSE，loss_func = nn.MSELoss()
+                            loss_func_1 = nn.MSELoss()
+                            recon_loss = loss_func_1(recon_x_c, x_c) 
                             #recon_loss = abs(loss_func(recon_x_c, x_c)) * 2000 # default, loss_func = nn.BCELoss()#TODO，这里为什么要乘2000，为什么BCEloss损失为负数
                         else:
                             for j, weight in enumerate(label_weight):
@@ -1681,8 +1685,10 @@ class VAE(nn.Module):
                         if label_weight is None: # default, label_weight is None
                             recon_x_bulk = self.decoder(z[loc[0]], 4, None)
                             recon_x_sc = self.decoder(z[loc[1]], 5, None)
-                            recon_loss_1 = loss_func(recon_x_bulk, x_c[loc[0]])
-                            recon_loss_2 = loss_func(recon_x_sc, x_c[loc[1]])
+                            # 使用MSE，loss_func = nn.MSELoss()
+                            loss_func_1 = nn.MSELoss()
+                            recon_loss_1 = loss_func_1(recon_x_bulk, x_c[loc[0]])
+                            recon_loss_2 = loss_func_1(recon_x_sc, x_c[loc[1]])
                             recon_loss = recon_loss_1 + recon_loss_2
 
                         kl_loss = kl_div(mu, var) 
@@ -1935,8 +1941,10 @@ class VAE(nn.Module):
                                 s = 1-s
                                 loss_s += np.sum(np.triu(s,1))/((s.shape[0]*s.shape[0])*2-s.shape[0])
                             cell_regularization_loss += loss_s
-
-                    recon_loss = loss_func(recon_x_c, x_c)
+                    
+                    # 使用MSE，loss_func = nn.MSELoss()
+                    loss_func_1 = nn.MSELoss()
+                    recon_loss = loss_func_1(recon_x_c, x_c)
                     kl_loss = kl_div(mu, var)
 
                     if drug_response:#drug_response_decoder
@@ -2161,8 +2169,10 @@ class VAE(nn.Module):
                     #use two data-specific decoder
                     recon_x_bulk = self.decoder(z[loc[0]], 4, None)
                     recon_x_sc = self.decoder(z[loc[1]], 5, None)
-                    recon_loss_1 = loss_func(recon_x_bulk, x_bulk.float().to(device))
-                    recon_loss_2 = loss_func(recon_x_sc, x_sc.float().to(device))
+                    # 使用MSE，loss_func = nn.MSELoss()
+                    loss_func_1 = nn.MSELoss()
+                    recon_loss_1 = loss_func_1(recon_x_bulk, x_bulk.float().to(device))
+                    recon_loss_2 = loss_func_1(recon_x_sc, x_sc.float().to(device))
                     recon_loss = recon_loss_1 + recon_loss_2
 
                     kl_loss = kl_div(mu, var)
@@ -2381,8 +2391,10 @@ class VAE(nn.Module):
                     #use two data-specific decoders
                     recon_x_bulk = self.decoder(z[loc[0]], 4, None)
                     recon_x_sc = self.decoder(z[loc[1]], 5, None)
-                    recon_loss_1 = loss_func(recon_x_bulk, x_bulk.float().to(device))
-                    recon_loss_2 = loss_func(recon_x_sc, x_sc.float().to(device))
+                    # 使用MSE，loss_func = nn.MSELoss()
+                    loss_func_1 = nn.MSELoss()
+                    recon_loss_1 = loss_func_1(recon_x_bulk, x_bulk.float().to(device))
+                    recon_loss_2 = loss_func_1(recon_x_sc, x_sc.float().to(device))
                     recon_loss = recon_loss_1 + recon_loss_2
                     kl_loss = kl_div(mu, var)
 
@@ -2581,8 +2593,10 @@ class VAE(nn.Module):
                                 s = 1-s
                                 loss_s += np.sum(np.triu(s,1))/((s.shape[0]*s.shape[0])*2-s.shape[0])
                             cell_regularization_loss += loss_s
-
-                    recon_loss = loss_func(recon_x_c, x_c)
+                    
+                    # 使用MSE，loss_func = nn.MSELoss()
+                    loss_func_1 = nn.MSELoss()
+                    recon_loss = loss_func_1(recon_x_c, x_c)
 
                     kl_loss = kl_div(mu, var)
 
@@ -2793,8 +2807,10 @@ class VAE(nn.Module):
 
                     recon_x_bulk = self.decoder(z[loc[0]], 4, None)
                     recon_x_sc = self.decoder(z[loc[1]], 5, None)
-                    recon_loss_1 = loss_func(recon_x_bulk, x_c[loc[0]])
-                    recon_loss_2 = loss_func(recon_x_sc, x_c[loc[1]])
+                    # 使用MSE，loss_func = nn.MSELoss()
+                    loss_func_1 = nn.MSELoss()
+                    recon_loss_1 = loss_func_1(recon_x_bulk, x_c[loc[0]])
+                    recon_loss_2 = loss_func_1(recon_x_sc, x_c[loc[1]])
                     recon_loss = recon_loss_1 + recon_loss_2
 
                     kl_loss = kl_div(mu, var)
@@ -3010,8 +3026,10 @@ class VAE(nn.Module):
 
                     recon_x_bulk = self.decoder(z_bulk, 4, None)
                     recon_x_sc = self.decoder(z_sc, 5, None)
-                    recon_loss_1 = loss_func(recon_x_bulk, x_bulk)
-                    recon_loss_2 = loss_func(recon_x_sc, x_sc)
+                    # 使用MSE，loss_func = nn.MSELoss()
+                    loss_func_1 = nn.MSELoss()
+                    recon_loss_1 = loss_func_1(recon_x_bulk, x_bulk)
+                    recon_loss_2 = loss_func_1(recon_x_sc, x_sc)
                     recon_loss = recon_loss_1 + recon_loss_2
 
                     kl_loss_1 = kl_div(mu_bulk, var_bulk)
