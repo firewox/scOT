@@ -528,14 +528,14 @@ def Run(
                     mmd_GAMMA=mmd_GAMMA, 
                     lambda_mmd=lambda_mmd, 
                 )
-        torch.save({'enc':enc, 'dec':dec, 'n_domain':n_domain, 'ref_id':ref_id, 'num_gene':num_gene, 'batch_size':batch_size,'lambda_recon':lambda_recon, 'lambda_kl':lambda_kl, 'lambda_ot':lambda_ot, 'lambda_response':lambda_response, 'sampler':sampler, 'unshared_decoder':unshared_decoder, 'unshared_encoder':unshared_encoder, 'mmd_match':mmd_match, 'cell_regularization':cell_regularization}, outdir+'/checkpoint/'+DRUG+'_config.pt')
+        torch.save({'enc':enc, 'dec':dec, 'n_domain':n_domain, 'ref_id':ref_id, 'num_gene':num_gene, 'batch_size':batch_size,'lambda_recon':lambda_recon, 'lambda_kl':lambda_kl, 'lambda_ot':lambda_ot, 'lambda_response':lambda_response, 'sampler':sampler, 'unshared_decoder':unshared_decoder, 'unshared_encoder':unshared_encoder, 'mmd_match':mmd_match, 'cell_regularization':cell_regularization, 'drop':drop}, outdir+'/checkpoint/'+DRUG+'_config.pt')
         torch.save(model.state_dict(), outdir+'/checkpoint/'+DRUG+'_model.pt')
     # predict
     else:
         print(f'####function.py##, out={out},load model with checkpoint')
         state = torch.load(outdir+'/checkpoint/'+DRUG+'_config.pt')
-        enc, dec, n_domain, ref_id, num_gene, batch_size, lambda_recon, lambda_kl, lambda_ot, lambda_response, sampler, unshared_decoder, unshared_encoder, mmd_match, cell_regularization = state['enc'], state['dec'], state['n_domain'], state['ref_id'], state['num_gene'], state['batch_size'], state['lambda_recon'], state['lambda_kl'], state['lambda_ot'], state['lambda_response'], state['sampler'], state['unshared_decoder'], state['unshared_encoder'], state['mmd_match'], state['cell_regularization']
-        model = VAE(enc, dec, ref_id=ref_id, n_domain=n_domain,batch_size=batch_size,lambda_recon=lambda_recon,lambda_kl=lambda_kl,lambda_ot=lambda_ot,lambda_response=lambda_response)
+        enc, dec, n_domain, ref_id, num_gene, batch_size, lambda_recon, lambda_kl, lambda_ot, lambda_response, sampler, unshared_decoder, unshared_encoder, mmd_match, cell_regularization, drop = state['enc'], state['dec'], state['n_domain'], state['ref_id'], state['num_gene'], state['batch_size'], state['lambda_recon'], state['lambda_kl'], state['lambda_ot'], state['lambda_response'], state['sampler'], state['unshared_decoder'], state['unshared_encoder'], state['mmd_match'], state['cell_regularization'], state['drop']
+        model = VAE(enc, dec, ref_id=ref_id, n_domain=n_domain,batch_size=batch_size,lambda_recon=lambda_recon,lambda_kl=lambda_kl,lambda_ot=lambda_ot,lambda_response=lambda_response,drop=drop)
         model.load_model(outdir+'/checkpoint/'+DRUG+'_model.pt')
         model.to(device)
         if mmd_match:
