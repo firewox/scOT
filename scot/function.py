@@ -26,7 +26,7 @@ from captum.attr import IntegratedGradients
 def Run(
         adatas=None,     
         adata_cm=None,   
-        lambda_recon=1.0,#作用在重建损失上，包括共同高表达基因、特异性高表达基因的损失
+        lambda_recon=1.0,
         lambda_kl=0.5,
         lambda_ot=1.0,
         lambda_response=1.0,

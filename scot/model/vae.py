@@ -869,7 +869,6 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         # Set distribution loss
         def mmd_loss_func(x,y,GAMMA=mmd_GAMMA):
@@ -1110,7 +1109,7 @@ class VAE(nn.Module):
             lambda_kl=0.5,
             lambda_recon=1.0,
             lambda_ot=1.0,
-            lambda_response=1.0, #TODO,药物响应预测模型的权重参数
+            lambda_response=1.0,
             reg=0.1,
             reg_m=1.0,
             lr=2e-4,
@@ -1118,8 +1117,8 @@ class VAE(nn.Module):
             early_stopping=None,
             device='cuda:0',  
             verbose=False,
-            drug_response=True, ###TODO,new feature
-            adata_cm=None ###TODO,new feature
+            drug_response=True,
+            adata_cm=None
         ):
         """
         train VAE
@@ -1175,12 +1174,10 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
-
         optim = torch.optim.Adam(self.parameters(), lr=lr, weight_decay=5e-4)
 
-        n_epoch = int(np.ceil(max_iteration/len(dataloader))) #用于向上取整，即返回不小于输入值的最小整数,len(dataloader)=1
+        n_epoch = int(np.ceil(max_iteration/len(dataloader)))
         if loss_type == 'BCE':
             loss_func = nn.BCELoss()
         elif loss_type == 'MSE':
@@ -1188,10 +1185,8 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq: # 用于在循环或迭代过程中显示进度条。它可以帮助你直观地了解代码的执行进度。
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
             for epoch in tq:
-                #TODO，dataloader.dataset是什么？，dataloader.dataset.shape=(22518, 4000)
-                #print(f'####vae.py#279行####################dataloader.dataset.shape={dataloader.dataset.shape}')
                 tk0 = tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
 
@@ -1326,21 +1321,13 @@ class VAE(nn.Module):
 
                 elif mode == 'h':
 
-                    for i, (x, y, idx) in tk0:#①y表示领域的id，0表示该条数据来自第一个数据集，1表示该条数据来自第二个数据集y=tensor([0, 1, 0, 1...])。   ②idx表示该条数据的索引号idx=tensor([ 9371,  6514,  9710]).
+                    for i, (x, y, idx) in tk0:
                         idx_origin = idx
-                        #TODO 对x，y，idx的值有疑问,@see:data_loader.py, 143rows, x.shape=torch.Size([22517, 4000]),y.shape=torch.Size([22517]),idx.shape=torch.Size([22517])
-                        # (x, y, idx) in tk0:,  @see:data_loader.py,143rows.
-                        #print(f'###vae.py#415rows#################(x.shape, y.shape, idx.shape)===x.shape={x.shape},y.shape={y.shape},idx.shape={idx.shape}')
-                        #print(f'###vae.py#416行################self.n_domain==={self.n_domain}') #self.n_domain===2
-                        #print(f'###vae.py#427行################num_gene==={num_gene}') #num_gene===[2000, 2000, 2000]
-                        x_c, y = x[:, 0:num_gene[self.n_domain]].float().to(device), y.long().to(device)  
+                        x_c, y = x[:, 0:num_gene[self.n_domain]].float().to(device), y.long().to(device)
                         idx = idx.to(device)
                                                     
-                        loc_ref = torch.where(y==self.ref_id)[0] #用于根据给定条件选择元素
-                        #TODO num_cell[0:self.ref_id]是什么, num_cell[0:self.ref_id]===[]，num_cell=[11259, 11259]，loc_ref=tensor([    0,     1,     2,  ..., 22510, 22512, 22514]
-                        #print(f'###vae.py#423rows############num_cell[0:self.ref_id]==={num_cell[0:self.ref_id]}，num_cell={num_cell}，loc_ref.shape={loc_ref.shape}')
-                        idx_ref = idx[loc_ref] - sum(num_cell[0:self.ref_id])#TODO，这个代码是什么意思？loc_ref是索引,loc_ref=tensor([  0,   1,   2,   3...])
-                        #print(f'###vae.py#425rows####################idx_ref.shape={idx_ref.shape}')#idx_ref是找到self.ref_id的索引号，idx_ref=tensor([ 9371,  6514,  9710,...])
+                        loc_ref = torch.where(y==self.ref_id)[0]
+                        idx_ref = idx[loc_ref] - sum(num_cell[0:self.ref_id])
                         loc_query = {}
                         idx_query = {}
                         tran_batch = {}
@@ -1353,7 +1340,6 @@ class VAE(nn.Module):
                             for j in query_id:
 
                                 loc_query[j] = torch.where(y==j)[0]
-                                #print(f'####vae.py#440rows############j={j},loc_query[j]={loc_query[j]}')
                                 idx_query[j] = idx[loc_query[j]] - sum(num_cell[0:j])
 
                                 if save_OT:
@@ -1376,20 +1362,15 @@ class VAE(nn.Module):
                         loc = loc_query
                         loc[self.ref_id] = loc_ref
                         idx = idx_query
-                        idx[self.ref_id] = idx_ref #x_c.shape=torch.Size([256, 2000])
+                        idx[self.ref_id] = idx_ref
                         #TODO，@see：vae.py, 148rows
                         z, mu, var = self.encoder(x_c, 0) #z.shape=torch.Size([256, 16]),mu.shape=torch.Size([256, 16]),var.shape=torch.Size([256, 16])
-                        #TODO,疑问，self.encoder(x_c, 0)==x_c.shape=torch.Size([22517, 2000])，z.shape=torch.Size([22517, 16])，mu.shape=torch.Size([22517, 16])，var.shape=torch.Size([22517, 16])
-                        #print(f'###vae.y#474rows##################self.encoder(x_c, 0)==x_c.shape={x_c.shape},z.shape={z.shape},mu.shape={mu.shape},var.shape={var.shape}')
-                        recon_x_c = self.decoder(z, 0, y)        
+                        recon_x_c = self.decoder(z, 0, y)
    
                         if label_weight is None: # default, label_weight is None
-                            #recon_loss = loss_func(recon_x_c, x_c) * 2000 # default, loss_func = nn.BCELoss()#TODO，这里为什么要乘2000，为什么BCEloss损失为负数
-                            #recon_loss = loss_func(recon_x_c, x_c) * num_gene[self.n_domain]
                             # 使用MSE，loss_func = nn.MSELoss()
                             loss_func_1 = nn.MSELoss()
                             recon_loss = loss_func_1(recon_x_c, x_c) 
-                            #recon_loss = abs(loss_func(recon_x_c, x_c)) * 2000 # default, loss_func = nn.BCELoss()#TODO，这里为什么要乘2000，为什么BCEloss损失为负数
                         else:
                             for j, weight in enumerate(label_weight):
 
@@ -1407,12 +1388,10 @@ class VAE(nn.Module):
                         kl_loss = kl_div(mu, var) 
                         if use_specific:
 
-                            x_s = x[:, num_gene[self.n_domain]:].float().to(device) #x.shape=torch.Size([22517, 4000])
+                            x_s = x[:, num_gene[self.n_domain]:].float().to(device)
 
                             for j in range(self.n_domain):
                                 if len(loc[j])>0:
-                                    #TODO，loc[j]是什么？,loc[j]应该是索引loc[j]=tensor([  0,   1,   2,   3,...]，loc[j].shape=torch.Size([11258])， z[loc[j]].shape=torch.Size([11258, 16])，z.shape=torch.Size([22517, 16])
-                                    #print(f'###vae.py#489rows###################loc[j].shape={loc[j].shape}，z[loc[j]].shape={z[loc[j]].shape}，z.shape={z.shape}，loc[j]={loc[j]}，loc={loc}')
                                     recon_x_s = self.decoder(z[loc[j]], j+1)
                                     recon_loss += lambda_s * loss_func(recon_x_s, x_s[loc[j]][:, 0:num_gene[j]]) * 2000 #计算特异性高表达基因的重建数据和原数据之间的损失函数
 
@@ -1421,12 +1400,9 @@ class VAE(nn.Module):
                                 if len(loc[j])>0 and j==0: # 表示取数据集x的隐空间嵌入z（取bulk细胞系的隐空间嵌入z ）
                                     if adata_cm is not None:
                                         a = idx_origin[y==j] #定位到数据集x（bulk细胞系）的索引，用来拿到其相应的response label
-                                        #groundtruth_bulk_label = adata_cm.obs['response'].iloc[a,].values.reshape(-1,1)
                                         groundtruth_bulk_label = adata_cm.obs['response'].iloc[a.tolist(),].values.reshape(-1,1)
                                         groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
-                                        #print(f'####vae.py#509rows##################groundtruth_bulk_label.shape={groundtruth_bulk_label.shape},groundtruth_bulk_label[:5]={groundtruth_bulk_label[:5]}')
-                                        predicted_bulk_label = self.decoder(z[loc[j]], j+2+1) # decoder(,0)表示所有共同数据的共同的解码器；decoder(,1)表示数据集X特异性高可变基因的解码器；decoder(,2)表示数据集Y特异性高可变基因的解码器；decoder(,3)表示所有共同数据里的数据X的药物响应解码器；
-                                        #print(f'####vae.py#511rows##################predicted_bulk_label.shape={predicted_bulk_label.shape},predicted_bulk_label[:5]={predicted_bulk_label[:5]}')
+                                        predicted_bulk_label = self.decoder(z[loc[j]], j+2+1)
                                         drug_response_loss = drug_response_loss = loss_func(predicted_bulk_label, groundtruth_bulk_label)#计算bulk细胞系药物响应真实标签和预测标签之间的损失函数
                         
                         if len(torch.unique(y))>1 and len(loc[self.ref_id])!=0:
@@ -1486,12 +1462,11 @@ class VAE(nn.Module):
                         loss = {'recloss':lambda_recon*recon_loss, 'klloss':lambda_kl*kl_loss, 'otloss':lambda_ot*ot_loss, 'drug_response_loss':lambda_response*drug_response_loss} #
                         
                         optim.zero_grad()
-                        sum(loss.values()).backward()#TODO，疑问，可以这样子后向传播吗？
+                        sum(loss.values()).backward()
                         optim.step()
 
                         for k,v in loss.items():
-                            epoch_loss[k] += loss[k].item() #TODO 疑问，loss[k].item()是什么, k=recloss,v=2528.068359375,loss.items()=dict_items([('recloss', tensor(...)), ('klloss', tensor(...)), ('otloss', tensor(...))])
-                            #print(f'#######vae.py#555rows#############(k,v) in loss.items()====k={k},v={v}')
+                            epoch_loss[k] += loss[k].item()
 
                         info = ','.join(['{}={:.2f}'.format(k, v) for k,v in loss.items()])
                         tk0.set_postfix_str(info)
@@ -1594,14 +1569,13 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         # Set distribution loss
         def mmd_loss_func(x,y,GAMMA=mmd_GAMMA):
             result = mmd.mmd_loss(x,y,GAMMA)
             return result
         optim = torch.optim.Adam(self.parameters(), lr=lr, weight_decay=5e-4)
-        n_epoch = int(np.ceil(max_iteration/len(dataloader))) #用于向上取整，即返回不小于输入值的最小整数,len(dataloader)=1
+        n_epoch = int(np.ceil(max_iteration/len(dataloader)))
         if loss_type == 'BCE':
             loss_func = nn.BCELoss()
         elif loss_type == 'MSE':
@@ -1609,7 +1583,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq: # 用于在循环或迭代过程中显示进度条。它可以帮助你直观地了解代码的执行进度。
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -1620,8 +1594,7 @@ class VAE(nn.Module):
                         idx = idx.to(device)
                                                     
                         loc_ref = torch.where(y==self.ref_id)[0] #用于根据给定条件选择元素
-                        idx_ref = idx[loc_ref] - sum(num_cell[0:self.ref_id])#TODO，这个代码是什么意思？loc_ref是索引,loc_ref=tensor([  0,   1,   2,   3...])
-                        #print(f'###vae.py#425rows####################idx_ref.shape={idx_ref.shape}')#idx_ref是找到self.ref_id的索引号，idx_ref=tensor([ 9371,  6514,  9710,...])
+                        idx_ref = idx[loc_ref] - sum(num_cell[0:self.ref_id])
                         loc_query = {}
                         idx_query = {}
                         tran_batch = {}
@@ -1634,7 +1607,6 @@ class VAE(nn.Module):
                             for j in query_id:
 
                                 loc_query[j] = torch.where(y==j)[0]
-                                #print(f'####vae.py#440rows############j={j},loc_query[j]={loc_query[j]}')
                                 idx_query[j] = idx[loc_query[j]] - sum(num_cell[0:j])
 
                                 if save_OT:
@@ -1676,7 +1648,6 @@ class VAE(nn.Module):
                                 # sc sim loss
                                 loss_s = 0
                                 for i in range(size):
-                                    #print(i)
                                     s = cosine_similarity(x_c[loc[1]][np.asarray(listResult) == i,:].cpu().detach().numpy())
                                     s = 1-s
                                     loss_s += np.sum(np.triu(s,1))/((s.shape[0]*s.shape[0])*2-s.shape[0])
@@ -1692,17 +1663,14 @@ class VAE(nn.Module):
                             recon_loss = recon_loss_1 + recon_loss_2
 
                         kl_loss = kl_div(mu, var) 
-                        if drug_response: #TODO drug_response_decoder的bulk模型训练
+                        if drug_response:
                             for j in range(self.n_domain):
                                 if len(loc[j])>0 and j==0: # 表示取数据集x的隐空间嵌入z（取bulk细胞系的隐空间嵌入z ）
                                     if adata_cm is not None:
                                         a = idx_origin[y==j] #定位到数据集x（bulk细胞系）的索引，用来拿到其相应的response label
-                                        #groundtruth_bulk_label = adata_cm.obs['response'].iloc[a,].values.reshape(-1,1)
                                         groundtruth_bulk_label = adata_cm.obs['response'].iloc[a.tolist(),].values.reshape(-1,1)
                                         groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
-                                        #print(f'####vae.py#509rows##################groundtruth_bulk_label.shape={groundtruth_bulk_label.shape},groundtruth_bulk_label[:5]={groundtruth_bulk_label[:5]}')
                                         predicted_bulk_label = self.decoder(z[loc[j]], j+2+1) # decoder(,0)表示所有共同数据的共同的解码器；decoder(,1)表示数据集X特异性高可变基因的解码器；decoder(,2)表示数据集Y特异性高可变基因的解码器；decoder(,3)表示所有共同数据里的数据X的药物响应解码器；
-                                        #print(f'####vae.py#511rows##################predicted_bulk_label.shape={predicted_bulk_label.shape},predicted_bulk_label[:5]={predicted_bulk_label[:5]}')
                                         drug_response_loss = drug_response_loss = loss_func(predicted_bulk_label, groundtruth_bulk_label)#计算bulk细胞系药物响应真实标签和预测标签之间的损失函数
                         
                         if len(torch.unique(y))>1 and len(loc[self.ref_id])!=0:
@@ -1765,12 +1733,11 @@ class VAE(nn.Module):
                         if global_match:
                             loss['mmd_loss'] = lambda_mmd*mmd_loss
                         optim.zero_grad()
-                        sum(loss.values()).backward()#TODO，疑问，可以这样子后向传播吗？
+                        sum(loss.values()).backward()
                         optim.step()
 
                         for k,v in loss.items():
-                            epoch_loss[k] += loss[k].item() #TODO 疑问，loss[k].item()是什么, k=recloss,v=2528.068359375,loss.items()=dict_items([('recloss', tensor(...)), ('klloss', tensor(...)), ('otloss', tensor(...))])
-                            #print(f'#######vae.py#555rows#############(k,v) in loss.items()====k={k},v={v}')
+                            epoch_loss[k] += loss[k].item()
 
                         info = ','.join(['{}={:.2f}'.format(k, v) for k,v in loss.items()])
                         tk0.set_postfix_str(info)
@@ -1848,7 +1815,6 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         # Set distribution loss
         def mmd_loss_func(x,y,GAMMA=mmd_GAMMA):
@@ -2070,7 +2036,6 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         def mmd_loss_func(x,y,GAMMA=mmd_GAMMA):
             result = mmd.mmd_loss(x,y,GAMMA)
@@ -2295,7 +2260,6 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         optim = torch.optim.Adam(self.parameters(), lr=lr, weight_decay=5e-4)
         if loss_type == 'BCE':
@@ -2518,7 +2482,6 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         # Set distribution loss
         def mmd_loss_func(x,y,GAMMA=mmd_GAMMA):
@@ -2725,7 +2688,6 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         # Set distribution loss
         def mmd_loss_func(x,y,GAMMA=mmd_GAMMA):
@@ -2935,7 +2897,6 @@ class VAE(nn.Module):
         drug_response
             if True, use drug_response decoder to predict drug response label. Default: True
         """
-
         self.to(device)
         optim = torch.optim.Adam(self.parameters(), lr=lr, weight_decay=5e-4)
         if loss_type == 'BCE':
@@ -3166,7 +3127,7 @@ class VAE(nn.Module):
                 for x,y,idx in dataloader: #=x.shape=torch.Size([11259, 4000])
                     print(f'####vae.py#838rows########count_a={count_a},count_b={count_b}')
                     x_c = x[:, 0:num_gene[self.n_domain]].float().to(device)
-                    z = self.encoder(x_c, 0)[1] #？？？这里竟然取得是mu，不重采样吗，
+                    z = self.encoder(x_c, 0)[1]
                     loc = {}
                     loc[0] = torch.where(y==0)[0]
                     loc[1] = torch.where(y==1)[0]
@@ -3204,9 +3165,7 @@ class VAE(nn.Module):
 
                 AUC_sc_test_avg = AUC_sc_test/count_b
                 APR_sc_test_avg = APR_sc_test/count_b
-                #bulk预测
                 print(f'{split}====AUC_bulk_'+train+f'==={AUC_bulk_test_avg},APR_bulk_'+train+f'==={APR_bulk_test_avg}')
-                #sc预测
                 print(f'{split}====AUC_sc_'+train+f'==={AUC_sc_test_avg},APR_sc_'+train+f'==={APR_sc_test_avg}')
 
                 # 保存性能指标
