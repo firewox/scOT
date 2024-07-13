@@ -884,7 +884,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq: # 用于在循环或迭代过程中显示进度条。它可以帮助你直观地了解代码的执行进度。
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq: # 用于在循环或迭代过程中显示进度条。它可以帮助你直观地了解代码的执行进度。
             for epoch in tq:
                 #TODO，dataloader.dataset是什么？，dataloader.dataset.shape=(22518, 4000)
                 #print(f'####vae.py#279行####################dataloader.dataset.shape={dataloader.dataset.shape}')
@@ -1185,7 +1185,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -1583,7 +1583,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -1829,7 +1829,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         print(f'####vae.py###, n_epoch={n_epoch}')
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(zip(Ctrainloader,cycle(Ptrainloader))),total=len(Ctrainloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -2049,7 +2049,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         print(f'####vae.py##, n_epoch={n_epoch}')
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(zip(Ctrainloader,cycle(Ptrainloader))),total=len(Ctrainloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -2269,7 +2269,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         print(f'####vae.py##，n_epoch={n_epoch}')
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(zip(Ctrainloader,cycle(Ptrainloader))),total=len(Ctrainloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -2496,7 +2496,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         print(f'####vae.py##, n_epoch={n_epoch}')
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -2702,7 +2702,7 @@ class VAE(nn.Module):
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
         print(f'####vae.py##，n_epoch={n_epoch}')
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
@@ -2905,7 +2905,7 @@ class VAE(nn.Module):
             loss_func = nn.MSELoss()
         elif loss_type == 'L1':
             loss_func = nn.L1Loss()
-        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs') as tq:
+        with tqdm(range(n_epoch), total=n_epoch, desc='Epochs', disable=(not verbose) ) as tq:
             for epoch in tq:
                 tk0 = tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc='Iterations', disable=(not verbose))
                 epoch_loss = defaultdict(float)
