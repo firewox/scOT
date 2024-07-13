@@ -42,6 +42,7 @@ parser.add_argument('--save_OT', type=int, default=0, help='option: (0, 1). 0 me
 parser.add_argument('--optimal_transmission', type=int, default=1, help='option: (0, 1). 0 means not using optimal transmission, and 1 means using optimal transmission')
 parser.add_argument('--random_sample', type=int, default=0, help='option: (0, 1). 0 means not randomly stratified sampling, and 1 means randomly stratified sampling')
 parser.add_argument('--data_path', type=str, default="/mnt/usb/code/lyutian/git_repositories/scOT/data/", help='data path')
+parser.add_argument('--verbose', type=int, default=0, help='0: display tqdm process; 1: do not display tqdm process')
 args = parser.parse_args()
 seed = args.seed
 n_epoch = args.n_epoch
@@ -170,7 +171,8 @@ tmp = so.Run(adatas=[data_bulk_adata, data_sc_adata],
                 drop=args.drop,
                 out=args.out,
                 save_OT=bool(args.save_OT),
-                optimal_transmission=bool(args.optimal_transmission),)
+                optimal_transmission=bool(args.optimal_transmission),
+                verbose=bool(args.verbose),)
 
 if bool(args.save_OT):
     train = tmp[1][1]
