@@ -627,11 +627,12 @@ def Run(
     
     #IntegratedGradients
     if printgene:
+        from captum.attr import IntegratedGradients
         print(f'####function.py##, study critical genes')
         target_model = TargetModel(model.decoder,model.encoder)
         ig = IntegratedGradients(target_model)
         x_tar = torch.FloatTensor(adatas[1].X).to(device)
-        scattr, delta =  ig.attribute(x_tar,target=0, return_convergence_delta=True,internal_batch_size=x_tar.shape[0])
+        scattr, delta =  ig.attribute(x_tar, return_convergence_delta=True,internal_batch_size=x_tar.shape[0])
         scattr = scattr.detach().cpu().numpy()
         # Save integrated gradient
         igadata= sc.AnnData(scattr)
