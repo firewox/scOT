@@ -192,7 +192,7 @@ class VAE(nn.Module):
                 if len(loc[1])>0: #take sc latent data
                     count_b+=1
                     groundtruth_sc_label = response_sc.reshape(-1,1)
-                    groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
+                    #groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
                     groundtruth_sc_label = groundtruth_sc_label.detach().cpu().numpy()
                     if unshared_encoder:
                         predicted_sc_label = self.decoder(z_sc, 0+2+1) #decoder(,3)represent drug response decoder
@@ -347,7 +347,7 @@ class VAE(nn.Module):
                     if len(loc[1])>0: #take sc latent data
                         count_b+=1
                         groundtruth_sc_label = response_sc.reshape(-1,1)
-                        groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
+                        #groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
                         groundtruth_sc_label = groundtruth_sc_label.detach().cpu().numpy()                            
                         if unshared_encoder:
                             predicted_sc_label = self.decoder(z_sc, 0+2+1) #decoder(,3) represents drug repponse decoder
@@ -553,7 +553,7 @@ class VAE(nn.Module):
                         count_b+=1
                         b = idx[y==1].tolist()
                         groundtruth_sc_label = adata_cm.obs['response'].iloc[b,].values.reshape(-1,1)
-                        groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
+                        #groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
                         groundtruth_sc_label = groundtruth_sc_label.detach().cpu().numpy()
                         predicted_sc_label = self.decoder(z[loc[1]], 0+2+1)
                         predicted_sc_label = predicted_sc_label.detach().cpu().numpy()
@@ -697,7 +697,7 @@ class VAE(nn.Module):
                         count_b+=1
                         b = idx[y==1].tolist()
                         groundtruth_sc_label = adata_cm.obs['response'].iloc[b,].values.reshape(-1,1)
-                        groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
+                        #groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
                         groundtruth_sc_label = groundtruth_sc_label.detach().cpu().numpy()
                         predicted_sc_label = self.decoder(z[loc[1]], 0+2+1)
                         predicted_sc_label = predicted_sc_label.detach().cpu().numpy()
@@ -3149,7 +3149,7 @@ class VAE(nn.Module):
                             count_b+=1
                             b = idx[y==1].tolist() #定位到数据集x（bulk细胞系）的索引，用来拿到其相应的response label
                             groundtruth_sc_label = adata_cm.obs['response'].iloc[b,].values.reshape(-1,1)
-                            groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
+                            #groundtruth_sc_label = torch.Tensor(groundtruth_sc_label).to(device)
                             groundtruth_sc_label = groundtruth_sc_label.detach().cpu().numpy()
                             predicted_sc_label = self.decoder(z[loc[1]], 0+2+1) # decoder(,0)表示所有共同数据的共同的解码器；decoder(,1)表示数据集X特异性高可变基因的解码器；decoder(,2)表示数据集Y特异性高可变基因的解码器；decoder(,3)表示所有共同数据里的数据X的药物响应解码器；
                             predicted_sc_label = predicted_sc_label.detach().cpu().numpy()
