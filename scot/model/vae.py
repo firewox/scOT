@@ -168,7 +168,7 @@ class VAE(nn.Module):
                 if len(loc[0])>0: #take bulk latent data
                     count_a+=1
                     groundtruth_bulk_label = response_bulk.reshape(-1,1)
-                    groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
+                    #groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
                     groundtruth_bulk_label = groundtruth_bulk_label.detach().cpu().numpy()
                     if unshared_encoder: #use two data-specific decoder
                         predicted_bulk_label = self.decoder(z_bulk, 0+2+1) #decoder(,3)represent drug response decoder
