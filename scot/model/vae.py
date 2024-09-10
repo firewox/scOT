@@ -326,7 +326,7 @@ class VAE(nn.Module):
                     if len(loc[0])>0: #take bulk latent data
                         count_a+=1
                         groundtruth_bulk_label = response_bulk.reshape(-1,1)
-                        groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
+                        #groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
                         groundtruth_bulk_label = groundtruth_bulk_label.detach().cpu().numpy()
                         if unshared_encoder: #use two data-specific encoder
                             predicted_bulk_label = self.decoder(z_bulk, 0+2+1) #decoder(,3) represents drug repponse decoder
@@ -376,6 +376,7 @@ class VAE(nn.Module):
                         print("The new directory is created!")
                 para = str(DRUG)+"_batch_size_"+str(self.batch_size)+"_source_batch_"+str(source_batch)+"_target_batch_"+str(target_batch)+"_sam_"+str(sampler)+"_lambda_recon_"+str(self.lambda_recon)+"_lambda_kl_"+str(self.lambda_kl)+"_lambda_ot_"+str(self.lambda_ot)+"_lambda_response_"+str(self.lambda_response)
                 # save
+                print(f"####save bulk_.h5ad\n####save sc_.h5ad\n####save adata_cm_.h5ad")
                 adatas[0].write("./drug/"+str(DRUG)+'/'+"bulk_"+para+".h5ad")
                 adatas[1].write("./drug/"+str(DRUG)+'/'+"sc_"+para+".h5ad")
                 adata_cm.write("./drug/"+str(DRUG)+'/'+"adata_cm_"+para+".h5ad")
@@ -534,7 +535,7 @@ class VAE(nn.Module):
                         count_a+=1
                         a = idx[y==0].tolist()
                         groundtruth_bulk_label = adata_cm.obs['response'].iloc[a,].values.reshape(-1,1)
-                        groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
+                        #groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
                         groundtruth_bulk_label = groundtruth_bulk_label.detach().cpu().numpy()
                         predicted_bulk_label = self.decoder(z[loc[0]], 0+2+1) #decoder(,3)represent drug reponse decoder
                         predicted_bulk_label = predicted_bulk_label.detach().cpu().numpy()
@@ -678,7 +679,7 @@ class VAE(nn.Module):
                         count_a+=1
                         a = idx[y==0].tolist()
                         groundtruth_bulk_label = adata_cm.obs['response'].iloc[a,].values.reshape(-1,1)
-                        groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
+                        #groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
                         groundtruth_bulk_label = groundtruth_bulk_label.detach().cpu().numpy()
                         predicted_bulk_label = self.decoder(z[loc[0]], 0+2+1) #decoder(,3) represent drug reponse decoder
                         predicted_bulk_label = predicted_bulk_label.detach().cpu().numpy()
@@ -722,6 +723,7 @@ class VAE(nn.Module):
                         os.makedirs(path)
                         print("The new directory is created!")
                 para = str(DRUG)+"_batch_size_"+str(self.batch_size)+"_source_batch_"+str(source_batch)+"_target_batch_"+str(target_batch)+"_sam_"+str(sampler)+"_lambda_recon_"+str(self.lambda_recon)+"_lambda_kl_"+str(self.lambda_kl)+"_lambda_ot_"+str(self.lambda_ot)+"_lambda_response_"+str(self.lambda_response)
+                print(f"####save bulk_.h5ad\n####save sc_.h5ad\n####save adata_cm_.h5ad")
                 adatas[0].write("./drug/"+str(DRUG)+'/'+"bulk_"+para+".h5ad")
                 adatas[1].write("./drug/"+str(DRUG)+'/'+"sc_"+para+".h5ad")
                 adata_cm.write("./drug/"+str(DRUG)+'/'+"adata_cm_"+para+".h5ad")
@@ -3136,7 +3138,7 @@ class VAE(nn.Module):
                             count_a+=1
                             a = idx[y==0].tolist() #定位到数据集x（bulk细胞系）的索引，用来拿到其相应的response label
                             groundtruth_bulk_label = adata_cm.obs['response'].iloc[a,].values.reshape(-1,1)
-                            groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
+                            #groundtruth_bulk_label = torch.Tensor(groundtruth_bulk_label).to(device)
                             groundtruth_bulk_label = groundtruth_bulk_label.detach().cpu().numpy()
                             predicted_bulk_label = self.decoder(z[loc[0]], 0+2+1) # decoder(,0)表示所有共同数据的共同的解码器；decoder(,1)表示数据集X特异性高可变基因的解码器；decoder(,2)表示数据集Y特异性高可变基因的解码器；decoder(,3)表示所有共同数据里的数据X的药物响应解码器；
                             predicted_bulk_label = predicted_bulk_label.detach().cpu().numpy()
