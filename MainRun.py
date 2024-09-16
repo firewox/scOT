@@ -59,7 +59,7 @@ encoder_h_dims_target = list(map(int, encoder_h_dims_target))
 ###########################################################1 READ Data，START
 print(str(DRUG))
 # linux
-# data_r=pd.read_csv(args.data_path + str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
+data_r=pd.read_csv(args.data_path + str(DRUG)+"/Source_expr_resp_z."+str(DRUG)+str(args.geneset)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 # windows
 # data_r=pd.read_csv("F:\\git_repositories\\SCAD\\data\\split_norm\\"+str(DRUG)+"\\Source_expr_resp_z."+str(DRUG)+".tsv", sep='\t', index_col=0, decimal='.') # source_data_path = args.bulk_data
 data_bulk = data_r.iloc[:,2:]
